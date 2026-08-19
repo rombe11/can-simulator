@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from enum import Enum
 
 from .bus import CanBus
+from .message import Message
 from .sender import PeriodicSender
 
 
@@ -45,22 +46,39 @@ class Node(ABC):
 
     @abstractmethod
     def init(self) -> None:
-        """
-        Node-specific initialization.
-        Every Node must implement this method.
-        """
         pass
+
+    def add_periodic_message(
+        self,
+        message: Message,
+        period_s: float,
+        **initial_values: float,
+    ) -> None:
+        self.sender.add_message(
+            message,
+            period_s=period_s,
+            **initial_values,
+        )
+
+    def set_message_values(
+        self,
+        message_name: str,
+        **values: float,
+    ) -> None:
+        self.sender.set_values(
+            message_name,
+            **values,
+        )
 
     def start(self) -> None:
         if self.state != NodeState.INITIALIZED:
             raise RuntimeError(
-                f"Node '{self.name}' must be initialized before start()"
+                f"Node '{self.name}' must be initialized "
+                f"before start()"
             )
 
         self.sender.start()
         self.state = NodeState.OPERATIONAL
-
-        print(f"[{self.name}] OPERATIONAL")
 
     def stop(self) -> None:
         if self.state == NodeState.STOPPED:
@@ -68,5 +86,3 @@ class Node(ABC):
 
         self.sender.stop()
         self.state = NodeState.STOPPED
-
-        print(f"[{self.name}] STOPPED")
