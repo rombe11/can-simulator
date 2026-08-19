@@ -2,22 +2,6 @@
 
 ## Structure
 
-```
-can_simulator/
-  core/
-    message.py   Message + Signal, bit-level encode/decode
-    bus.py       BusConfig, CanBus, BusManager - N independent CAN lines
-    config.py    loads config/buses.yaml into BusConfig objects
-    sender.py    PeriodicSender - sends a message repeatedly at a frequency
-  testing/
-    client.py    CanTestClient - send stimuli, expect()/wait_for_raw() responses
-config/
-  buses.yaml     one entry per CAN line: channel, interface, bitrate
-tests/
-  conftest.py    bus fixtures + pytest hook that writes test_results.csv
-  test_example.py
-```
-
 ## Install
 
 ```
@@ -102,3 +86,9 @@ frame.data[0]
 ```
 
 See `tests/test_raw_bytes.py` for both in a runnable test.
+
+## Run
+- replace rom with your username 
+cd /home/rom/clones/can-simulator
+source venv/bin/activate
+PYTHONPATH=/home/rom/clones/can-simulator:$PYTHONPATH python -m can_simulator.run_bus 
