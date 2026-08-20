@@ -8,8 +8,8 @@ from can_simulator.core.sender import PeriodicSender
 def main() -> None:
     can0 = CanBus(
         BusConfig(
-            channel="CAN0",
-            interface="virtual",
+            channel="vcan0",
+            interface="socketcan",
             bitrate=500_000,
             receive_own_messages=True,
         )
@@ -17,8 +17,8 @@ def main() -> None:
 
     can1 = CanBus(
         BusConfig(
-            channel="CAN1",
-            interface="virtual",
+            channel="vcan1",
+            interface="socketcan",
             bitrate=500_000,
             receive_own_messages=True,
         )
@@ -29,8 +29,8 @@ def main() -> None:
     can0.add_listener(monitor)
     can1.add_listener(monitor)
 
-    sender0 = PeriodicSender("Sender_CAN0", can0)
-    sender1 = PeriodicSender("Sender_CAN1", can1)
+    sender0 = PeriodicSender("Sender_vcan0", can0)
+    sender1 = PeriodicSender("Sender_vcan1", can1)
 
     sender0.add_raw("status_node1", arbitration_id=0x100, period_s=0.1, data=b"\x01\x02\x03\x04\x05\x06\x07\x08")
     sender0.add_raw("status_node2", arbitration_id=0x200, period_s=0.5, data=b"\x10\x20\x30\x40\x50\x60\x70\x80")
@@ -41,7 +41,7 @@ def main() -> None:
     sender0.start()
     sender1.start()
 
-    print("CAN simulator running (Unified PCAN Style Monitor with Periodic Dynamic Updates)")
+    print("CAN simulator running")
     print("Press Ctrl+C to stop")
 
     counter = 0
