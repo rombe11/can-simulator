@@ -16,9 +16,10 @@ The CAN Simulator is a lightweight, Python-based framework designed for simulati
 
 
 # set up environment:
-python3 -m venv venv 
-source venv/bin/activa te
-pip install -r requirements.txt
+
+- python3 -m venv venv 
+- source venv/bin/activa te
+- pip install -r requirements.txt
 
 # set up virtual can on Linux:
 
@@ -33,7 +34,9 @@ sudo ip link set up vcan0
 sudo ip link set up vcan1
 
 # Option B: Real PEAK Hardware Setup (HIL mode)
+
 sudo ip link set can0 up type can bitrate 500000
+
 # Run Simulation:
 
 - python -m can_simulator.simulation.poc // or other simulation file
