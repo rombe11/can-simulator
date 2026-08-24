@@ -5,7 +5,8 @@ import threading
 from can_simulator.core.bus import BusConfig, CanBus
 from can_simulator.core.monitor import PCANStyleMonitor
 from can_simulator.core.node_manager import NodeManager
-from can_simulator.nodes.j1939_sensor_node import J1939SensorNode
+from can_simulator.nodes.j1939_sensors_node import J1939SensorNode
+from can_simulator.core.message import MessageCollector
 
 
 def create_buses(bus_prefix: str = "") -> dict[str, CanBus]:
@@ -31,6 +32,13 @@ def setup_monitor(buses: dict[str, CanBus], name: str) -> PCANStyleMonitor:
     return monitor
 
 
+def setup_collector(buses: dict[str, CanBus], collector: MessageCollector | None = None) -> MessageCollector:
+    active_collector = collector if collector is not None else MessageCollector()
+    for bus in buses.values():
+        bus.add_listener(active_collector)
+    return active_collector
+
+
 def setup_devices(buses: dict[str, CanBus], bus_prefix: str = "") -> tuple[NodeManager, J1939SensorNode]:
     manager = NodeManager()
     device = J1939SensorNode(f"{bus_prefix}J1939Device", buses["can4"])
@@ -38,10 +46,15 @@ def setup_devices(buses: dict[str, CanBus], bus_prefix: str = "") -> tuple[NodeM
     return manager, device
 
 
-def run_system_b_simulation(bus_prefix: str = "", stop_event: threading.Event | None = None) -> None:
+def run_system_simulation(
+    bus_prefix: str = "", 
+    stop_event: threading.Event | None = None, 
+    collector: MessageCollector | None = None
+) -> MessageCollector:
     buses = create_buses(bus_prefix)
     monitor_name = f"{bus_prefix.upper()}SYSTEM_MONITOR" if bus_prefix else "SYSTEM_GLOBAL_MONITOR"
-    monitor = setup_monitor(buses, monitor_name)
+    setup_monitor(buses, monitor_name)
+    active_collector = setup_collector(buses, collector)
     manager, device = setup_devices(buses, bus_prefix)
 
     manager.initialize_all()
@@ -50,7 +63,7 @@ def run_system_b_simulation(bus_prefix: str = "", stop_event: threading.Event | 
     counter = 0
 
     try:
-        while stop_event is None or not stop_event.is_set():
+        while True:
             time.sleep(0.3)
             counter = (counter + 1) % 250
 
@@ -74,9 +87,11 @@ def run_system_b_simulation(bus_prefix: str = "", stop_event: threading.Event | 
         for bus in buses.values():
             bus.shutdown()
 
+    return active_collector
+
 
 def main() -> None:
-    run_system_b_simulation()
+    run_system_simulation()
 
 
 if __name__ == "__main__":
