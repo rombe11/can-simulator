@@ -33,18 +33,20 @@ class PCANStyleMonitor(can.Listener):
     def __init__(self, name: str, update_interval: float = 0.1) -> None:
         super().__init__()
         self.name: str = name
-        self.messages: dict[int, dict] = {}
+        self.messages: dict[tuple[str, int], dict] = {}
         self.update_interval = update_interval
         self.last_update_time = 0.0
 
     def on_message_received(self, msg: can.Message) -> None:
+        channel_str = str(getattr(msg, "channel", self.name))
         arb_id = msg.arbitration_id
+        key = (channel_str, arb_id)
         
-        if arb_id in self.messages:
-            self.messages[arb_id]["count"] += 1
-            self.messages[arb_id]["msg"] = msg
+        if key in self.messages:
+            self.messages[key]["count"] += 1
+            self.messages[key]["msg"] = msg
         else:
-            self.messages[arb_id] = {
+            self.messages[key] = {
                 "count": 1,
                 "msg": msg,
             }
@@ -55,16 +57,15 @@ class PCANStyleMonitor(can.Listener):
             self.refresh_display()
 
     def refresh_display(self) -> None:
-        output = [f"\n--- [{self.name}] CAN Bus Simulator Monitor (PCAN Style) ---"]
+        output = [f"\n--- [{self.name}] Multi-Bus CAN Simulator Monitor (PCAN Style) ---"]
         output.append(f"{'Channel':<10} | {'ID':<10} | {'Count':<8} | {'DLC':<4} | {'Data'}")
         output.append("-" * 58)
 
-        for arb_id in sorted(self.messages.keys()):
-            item = self.messages[arb_id]
+        for key in sorted(self.messages.keys(), key=lambda k: (k[0], k[1])):
+            channel_str, arb_id = key
+            item = self.messages[key]
             msg = item["msg"]
             count = item["count"]
-
-            channel_str = str(getattr(msg, "channel", self.name))
 
             if msg.is_extended_id:
                 id_str = f"0x{arb_id:08X}"
