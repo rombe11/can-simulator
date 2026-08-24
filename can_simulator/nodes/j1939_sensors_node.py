@@ -41,5 +41,21 @@ class J1939SensorNode(Node):
             is_extended_id=True,
         )
 
+        self.sender.add_raw(
+            name="alt_manufacturer_sensor",
+            arbitration_id=0x18FEF320,
+            period_s=0.2,
+            data=bytes([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]),
+            is_extended_id=True,
+        )
+
+        self.sender.add_raw(
+            name="gas_analyzer_sensor",
+            arbitration_id=0x18FEF430,
+            period_s=0.25,
+            data=bytes([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]),
+            is_extended_id=True,
+        )
+
     def update_sensor_value(self, sensor_name: str, index: int, value: int) -> None:
         self.sender.set_byte(sensor_name, index=index, value=value)
