@@ -63,7 +63,7 @@ def run_system_simulation(
     counter = 0
 
     try:
-        while True:
+        while stop_event is None or not stop_event.is_set():
             time.sleep(0.3)
             counter = (counter + 1) % 250
 
