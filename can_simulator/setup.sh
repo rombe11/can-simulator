@@ -2,11 +2,18 @@
 
 set -e
 
-echo "=== Setting up Virtual CAN interfaces for System A (user_can) ==="
+# Check if an argument was passed
+if [ -z "$1" ]; then
+    echo "Usage: ./run_systems.sh [front|back]"
+    exit 1
+fi
+
+MODE="$1"
+
+echo "=== Setting up Virtual CAN interfaces for System Front (user_can) ==="
 
 sudo modprobe vcan
 
-# Create and bring up the vcan interfaces for System A (can2, can3, can4, can5)
 for ch in can2 can3 can4 can5; do
     interface="user_${ch}"
 
@@ -20,9 +27,8 @@ for ch in can2 can3 can4 can5; do
     fi
 done
 
-echo "=== Setting up Virtual CAN interfaces for System B (sysB_) ==="
+echo "=== Setting up Virtual CAN interfaces for System Back (sysB_) ==="
 
-# Create and bring up the vcan interfaces for System B (can3, can4, can5)
 for ch in can3 can4 can5; do
     interface="sysB_${ch}"
 
@@ -37,7 +43,7 @@ for ch in can3 can4 can5; do
 done
 
 echo "=== All Virtual CAN interfaces are ready ==="
-echo "=== Starting Python Simulation ==="
+echo "=== Starting Python Simulation ($MODE) ==="
 
-python -m can_simulator.main
+python3 -m can_simulator.main "$MODE"
 echo "=== Simulation completed ==="
