@@ -41,3 +41,9 @@ sudo ip link set can0 up type can bitrate 500000
 
 - python -m can_simulator.simulation.poc // or other simulation file
 - python -m pytest /tests
+
+## Run main system simulation
+- for back system:
+    ./can_simulator/setup.sh back 
+- for front system:
+    ./can_simulator/setup.sh front
