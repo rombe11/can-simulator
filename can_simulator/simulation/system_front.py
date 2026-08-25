@@ -6,9 +6,9 @@ from can_simulator.core.bus import BusConfig, CanBus
 from can_simulator.core.monitor import PCANStyleMonitor
 from can_simulator.core.node_manager import NodeManager
 from can_simulator.core.message import MessageCollector
-from can_simulator.nodes.button_node import ButtonControllerNode
-from can_simulator.nodes.gateway_node import SystemFrontGatewayNode
-from can_simulator.nodes.canopen_slave_node import CANopenSlaveNode
+from can_simulator.nodes.front_button_node import ButtonControllerNode
+from can_simulator.nodes.front_back_communication import SystemFrontGatewayNode
+from can_simulator.nodes.canopen_slave import CANopenSlaveNode
 
 
 def create_system_front_buses() -> dict[str, CanBus]:
