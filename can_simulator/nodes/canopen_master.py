@@ -3,11 +3,11 @@ from __future__ import annotations
 import time
 import can
 from can_simulator.core.bus import CanBus
-from can_simulator.core.node import Node, NodeState
+from can_simulator.core.node import Node
 
 
 class CANopenMasterControllerNode(Node, can.Listener):
-    def __init__(self, name: str, bus: CanBus, target_node_id: int = 0x20) -> None:
+    def __init__(self, name: str, bus: CanBus, target_node_id: int = 0x1E) -> None:
         super().__init__(name, bus)
         self.target_node_id: int = target_node_id
         self.cob_sdo_rx: int = 0x600 + target_node_id
@@ -15,7 +15,9 @@ class CANopenMasterControllerNode(Node, can.Listener):
         self.cob_nmt: int = 0x000
         self.cob_rpdo1: int = 0x200 + target_node_id
         self.cob_tpdo1: int = 0x180 + target_node_id
+        self.cob_feedback: int = 0x180 + target_node_id
         self.bootup_received: bool = False
+        self.last_feedback: bytes | None = None
 
     def init(self) -> None:
         self.bus.add_listener(self)
@@ -23,6 +25,8 @@ class CANopenMasterControllerNode(Node, can.Listener):
     def on_message_received(self, msg: can.Message) -> None:
         if msg.arbitration_id == (0x700 + self.target_node_id):
             self.bootup_received = True
+        elif msg.arbitration_id == self.cob_feedback:
+            self.last_feedback = msg.data
 
     def send_nmt_start(self) -> None:
         self.bus.send_raw(
