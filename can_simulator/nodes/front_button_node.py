@@ -11,7 +11,7 @@ class ButtonControllerNode(Node):
     def init(self) -> None:
         self.sender.add_raw(
             name="button_status",
-            arbitration_id=0x0C22D890,
+            arbitration_id=0x0CFF9105,
             period_s=0.1,
             data=bytes([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]),
             is_extended_id=True
