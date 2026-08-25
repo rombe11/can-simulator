@@ -6,10 +6,10 @@ echo "=== Setting up Virtual CAN interfaces for System A (user_can) ==="
 
 sudo modprobe vcan
 
-# Create and bring up the vcan interfaces for System A
-for ch in can3 can4 can5; do
+# Create and bring up the vcan interfaces for System A (can2, can3, can4, can5)
+for ch in can2 can3 can4 can5; do
     interface="user_${ch}"
-    
+
     if ip link show "$interface" &> /dev/null; then
         echo "Interface $interface already exists, bringing it up..."
         sudo ip link set up "$interface"
@@ -22,10 +22,10 @@ done
 
 echo "=== Setting up Virtual CAN interfaces for System B (sysB_) ==="
 
-# Create and bring up the vcan interfaces for System B
+# Create and bring up the vcan interfaces for System B (can3, can4, can5)
 for ch in can3 can4 can5; do
     interface="sysB_${ch}"
-    
+
     if ip link show "$interface" &> /dev/null; then
         echo "Interface $interface already exists, bringing it up..."
         sudo ip link set up "$interface"
