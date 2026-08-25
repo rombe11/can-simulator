@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
+import can
 
 
 @dataclass
@@ -75,3 +76,22 @@ class MessageDB:
 
     def __iter__(self):
         return iter(self._by_name.values())
+
+
+class MessageCollector(can.Listener):
+    def __init__(self) -> None:
+        super().__init__()
+        self.messages: List[can.Message] = []
+
+    def on_message_received(self, msg: can.Message) -> None:
+        self.messages.append(msg)
+
+    @property
+    def last_message(self) -> Optional[can.Message]:
+        return self.messages[-1] if self.messages else None
+
+    def get_by_id(self, arbitration_id: int) -> List[can.Message]:
+        return [m for m in self.messages if m.arbitration_id == arbitration_id]
+
+    def clear(self) -> None:
+        self.messages.clear()
